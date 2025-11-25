@@ -18,24 +18,20 @@ const userStore = useUserStore()
 // Función para manejar el inicio de sesión
 const handleLogin = async () => {
   let response = await login({ email: email.value, password: password.value })
-  response = response?.data
-  if (response) {
-    if (remindEmail.value) {
-      localStorage.setItem('email', email.value)
-    }
-    let tokenDecoded = jwtDecode(response.token)
+  if (response && response.data && response.data.token) {
+    const token = response.data.token
+    if (remindEmail.value) localStorage.setItem('email', email.value)
+
+    const tokenDecoded = jwtDecode(token)
     userStore.setUser(tokenDecoded)
-    localStorage.setItem('token', response.token)
+    localStorage.setItem('token', token)
     router.push({ name: 'home' })
   }
 }
 
 onBeforeMount(() => {
-  if (localStorage.getItem('token')) {
-    router.push({ name: 'home' })
-  } else if (localStorage.getItem('email')) {
-    email.value = localStorage.getItem('email')
-  }
+  if (localStorage.getItem('token')) router.push({ name: 'home' })
+  else if (localStorage.getItem('email')) email.value = localStorage.getItem('email')
 })
 </script>
 

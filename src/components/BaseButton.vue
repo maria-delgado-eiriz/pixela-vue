@@ -2,7 +2,7 @@
 import { defineProps } from 'vue'
 
 // Props para recibir el tipo, el color, el tamaño y si está deshabilitado
-const props = defineProps({
+defineProps({
   type: {
     type: String,
     default: 'button', // Valores posibles: 'button', 'submit', 'reset'

@@ -2,7 +2,7 @@
 import { defineProps } from 'vue'
 
 // Props para recibir el redondeo, la sombra, el color de fondo y el tamaño
-const props = defineProps({
+defineProps({
   rounded: {
     type: String,
     default: 'md', // Opciones: 'sm', 'md', 'lg', 'full'
