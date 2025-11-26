@@ -1,7 +1,4 @@
 <script setup>
-import BaseCard from '../components/BaseCard.vue'
-import BaseInput from '../components/BaseInput.vue'
-import BaseButton from '../components/BaseButton.vue'
 import { onBeforeMount, ref } from 'vue'
 import { login } from '../api/auth.api.js'
 import { useRouter } from 'vue-router'
@@ -12,15 +9,15 @@ import { jwtDecode } from 'jwt-decode'
 const email = ref('')
 const password = ref('')
 const router = useRouter()
-const remindEmail = ref(false)
+const remember = ref(false)
 const userStore = useUserStore()
 
 // Función para manejar el inicio de sesión
-const handleLogin = async () => {
+const submitLogin = async () => {
   let response = await login({ email: email.value, password: password.value })
   if (response && response.data && response.data.token) {
     const token = response.data.token
-    if (remindEmail.value) localStorage.setItem('email', email.value)
+    if (remember.value) localStorage.setItem('email', email.value)
 
     const tokenDecoded = jwtDecode(token)
     userStore.setUser(tokenDecoded)
@@ -36,64 +33,66 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <!-- BaseCard centrado -->
-    <BaseCard size="md" rounded="lg" shadow="lg" bgColor="bg-white">
-      <template #title>
-        <h2 class="text-2xl font-bold text-center text-gray-700">Iniciar Sesión</h2>
-      </template>
+  <div class="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+    <div class="w-full max-w-md bg-white shadow-lg rounded-xl p-8">
+      <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Iniciar sesión</h2>
 
-      <template #content>
-        <form @submit.prevent="handleLogin">
-          <BaseInput
-            label="Correo Electrónico"
-            placeholder="Ingresa tu correo"
-            type="email"
-            required
+      <form @submit.prevent="submitLogin">
+        <!-- Email -->
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-1"> Email </label>
+          <input
             v-model="email"
-            class="mb-4"
-          />
-
-          <BaseInput
-            label="Contraseña"
-            placeholder="Ingresa tu contraseña"
-            type="password"
+            type="email"
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-400"
+            placeholder="email"
             required
-            v-model="password"
-            class="mb-4"
           />
-
-          <div class="flex justify-between items-center mb-4">
-            <label class="inline-flex items-center">
-              <input type="checkbox" class="form-checkbox" v-model="remindEmail" />
-              <span class="ml-2 text-gray-600">Recordarme</span>
-            </label>
-            <br />
-            <router-link to="/forgot-password">
-              <a href="#" class="text-blue-500 hover:underline text-sm"
-                >¿Olvidaste tu contraseña?</a
-              >
-            </router-link>
-          </div>
-
-          <!-- Botón de iniciar sesión -->
-          <BaseButton type="submit" color="blue" size="md" class="w-full">
-            Iniciar Sesión
-          </BaseButton>
-        </form>
-      </template>
-
-      <template #footer>
-        <div class="flex justify-center mt-4">
-          <p class="text-sm text-gray-600">
-            ¿No tienes una cuenta?
-            <router-link to="/signup" class="text-blue-500 hover:underline">
-              <a href="#" class="text-blue-500 hover:underline">Regístrate</a>
-            </router-link>
-          </p>
         </div>
-      </template>
-    </BaseCard>
+
+        <!-- Password -->
+        <div class="mb-2">
+          <label class="block text-gray-700 text-sm font-medium mb-1"> Contraseña </label>
+          <input
+            v-model="password"
+            type="password"
+            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring focus:border-blue-400"
+            placeholder="********"
+            required
+          />
+        </div>
+
+        <!-- Remember + Forgot -->
+        <div class="flex items-center justify-between mb-6">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              v-model="remember"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            />
+            <span class="ml-2 text-gray-600 text-sm">Recordarme</span>
+          </label>
+
+          <router-link to="/forgot-password" class="text-blue-500 text-sm hover:underline">
+            ¿Olvidaste tu contraseña?
+          </router-link>
+        </div>
+
+        <!-- Button -->
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Entrar
+        </button>
+      </form>
+
+      <!-- Register Link -->
+      <p class="text-center mt-6 text-sm text-gray-600">
+        ¿No tienes cuenta?
+        <router-link to="/signup" class="text-blue-600 hover:underline"> Regístrate </router-link>
+      </p>
+    </div>
   </div>
 </template>
 
