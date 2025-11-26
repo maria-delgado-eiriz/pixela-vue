@@ -9,7 +9,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('./components/HelloWorld.vue'),
+      component: () => import('./views/LayoutView.vue'),
       beforeEnter: (to, from, next) => {
         const token = localStorage.getItem('token')
         if (!token) {
