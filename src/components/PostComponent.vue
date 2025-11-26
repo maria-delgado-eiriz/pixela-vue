@@ -1,5 +1,9 @@
 <script setup>
+import { ref } from 'vue'
 import { useUserStore } from '../store/user.store'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faHeart as faHeartSolid, faCommentDots } from '@fortawesome/free-solid-svg-icons'
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 
 const props = defineProps({
   id: {
@@ -18,18 +22,25 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  author: {
-    type: Object,
+  username: {
+    type: String,
+    required: true,
+  },
+  fullName: {
+    type: String,
     required: true,
   },
 })
 
 const userStore = useUserStore()
+const isLiked = ref(false)
 
 const handleLike = () => {
+  isLiked.value = !isLiked.value
   // TODO call enpoint to like the post
   console.log('Post ID:', props.id)
   console.log('Liker:', userStore.username)
+  console.log('Liked:', isLiked.value)
 }
 </script>
 
@@ -53,11 +64,11 @@ const handleLike = () => {
         <div
           class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
         >
-          <span class="text-white font-semibold text-sm">{{ author.name.charAt(0) }}</span>
+          <span class="text-white font-semibold text-sm">{{ fullName.charAt(0) }}</span>
         </div>
         <div>
-          <p class="text-gray-200 font-medium text-sm">{{ author.name }}</p>
-          <p class="text-gray-500 text-xs">@{{ author.username }}</p>
+          <p class="text-gray-200 font-medium text-sm">{{ fullName }}</p>
+          <p class="text-gray-500 text-xs">@{{ username }}</p>
         </div>
       </div>
 
@@ -77,13 +88,16 @@ const handleLike = () => {
       >
         <button
           @click="handleLike"
-          class="flex items-center space-x-2 hover:text-indigo-400 transition-colors"
+          :class="[
+            'flex items-center space-x-2 transition-colors',
+            isLiked ? 'text-red-500 hover:text-red-600' : 'hover:text-indigo-400',
+          ]"
         >
-          <span>❤️</span>
+          <FontAwesomeIcon :icon="isLiked ? faHeartSolid : faHeartRegular" />
           <span>Me gusta</span>
         </button>
         <button class="flex items-center space-x-2 hover:text-indigo-400 transition-colors">
-          <span>💬</span>
+          <FontAwesomeIcon :icon="faCommentDots" />
           <span>Comentar</span>
         </button>
       </div>
@@ -95,6 +109,7 @@ const handleLike = () => {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -102,6 +117,7 @@ const handleLike = () => {
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
