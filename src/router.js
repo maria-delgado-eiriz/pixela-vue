@@ -8,7 +8,7 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'home',
+      name: 'layout',
       component: () => import('./views/LayoutView.vue'),
       beforeEnter: (to, from, next) => {
         const token = localStorage.getItem('token')
@@ -17,6 +17,13 @@ const router = createRouter({
         }
         return next()
       },
+      children: [
+        {
+          path: '',
+          name: 'home',
+          component: () => import('./views/HomeView.vue'),
+        },
+      ],
     },
     {
       path: '/login',
