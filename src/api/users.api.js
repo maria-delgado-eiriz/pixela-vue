@@ -23,6 +23,11 @@ export const followUser = async userId => {
 }
 
 export const unfollowUser = async userId => {
-  const response = await httpClient.post(`${BASE_PATH}/${userId}/unfollow`)
+  const response = await httpClient.delete(`${BASE_PATH}/${userId}/unfollow`)
+  return response.data
+}
+
+export const searchUsers = async searchTerm => {
+  const response = await httpClient.get(`${BASE_PATH}/search?query=${searchTerm}`)
   return response.data
 }
