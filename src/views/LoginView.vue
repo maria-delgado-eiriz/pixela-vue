@@ -4,7 +4,7 @@ import { login } from '../api/auth.api.js'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user.store'
 import { jwtDecode } from 'jwt-decode'
-
+import { getUserFollowers, getUserFollowing } from '@/api/users.api.js'
 // Definimos los datos del formulario
 const email = ref('')
 const password = ref('')
@@ -17,11 +17,19 @@ const submitLogin = async () => {
   let response = await login({ email: email.value, password: password.value })
   if (response && response.data && response.data.token) {
     const token = response.data.token
+    localStorage.setItem('token', token)
     if (remember.value) localStorage.setItem('email', email.value)
 
     const tokenDecoded = jwtDecode(token)
     userStore.setUser(tokenDecoded)
-    localStorage.setItem('token', token)
+    const userId = tokenDecoded.id
+
+    const followersData = await getUserFollowers(userId)
+    const followingData = await getUserFollowing(userId)
+
+    userStore.setFollowers(followersData)
+    userStore.setFollowing(followingData)
+
     router.push({ name: 'home' })
   }
 }

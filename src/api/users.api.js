@@ -6,3 +6,23 @@ export const getUserProfile = async userId => {
   const response = await httpClient.get(`${BASE_PATH}/${userId}/profile`)
   return response.data
 }
+
+export const getUserFollowers = async userId => {
+  const response = await httpClient.get(`${BASE_PATH}/${userId}/followers`)
+  return response.data
+}
+
+export const getUserFollowing = async userId => {
+  const response = await httpClient.get(`${BASE_PATH}/${userId}/following`)
+  return response.data
+}
+
+export const followUser = async userId => {
+  const response = await httpClient.post(`${BASE_PATH}/${userId}/follow`)
+  return response.data
+}
+
+export const unfollowUser = async userId => {
+  const response = await httpClient.post(`${BASE_PATH}/${userId}/unfollow`)
+  return response.data
+}

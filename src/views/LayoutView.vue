@@ -1,6 +1,6 @@
 <script setup lang="js">
-import { RouterView, useRouter } from "vue-router";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { RouterView, useRouter } from 'vue-router'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import {
   faHome,
   faUser,
@@ -8,46 +8,54 @@ import {
   faComments,
   faBars,
   faXmark,
-} from "@fortawesome/free-solid-svg-icons";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+} from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 
-import { ref, onBeforeMount } from "vue";
-import { useUserStore } from "../store/user.store";
-import { jwtDecode } from "jwt-decode";
-import { useRoute } from "vue-router";
+import { ref, onBeforeMount } from 'vue'
+import { useUserStore } from '../store/user.store'
+import { jwtDecode } from 'jwt-decode'
+import { useRoute } from 'vue-router'
+import { getUserFollowers, getUserFollowing } from '@/api/users.api.js'
 
-const route = useRoute();
-const router = useRouter();
-const userStore = useUserStore();
+const route = useRoute()
+const router = useRouter()
+const userStore = useUserStore()
 
-const mobileMenuOpen = ref(false);
+const mobileMenuOpen = ref(false)
 
 const logout = () => {
-  localStorage.removeItem("token");
-  router.push({ name: "login" });
-};
+  localStorage.removeItem('token')
+  router.push({ name: 'login' })
+}
 
 const goToProfile = () => {
-  router.push({ name: "profile", params: { id: userStore.id } });
-  if (route.name === "profile") setTimeout(() => router.go(0), 100);
-};
+  router.push({ name: 'profile', params: { id: userStore.id } })
+  if (route.name === 'profile') setTimeout(() => router.go(0), 100)
+}
 
-onBeforeMount(() => {
-  if (!localStorage.getItem("token")) {
-    router.push({ name: "login" });
+onBeforeMount(async () => {
+  if (!localStorage.getItem('token')) {
+    router.push({ name: 'login' })
   } else {
-    let token = localStorage.getItem("token");
-    const isExpired = Date.now() >= jwtDecode(token).exp * 1000;
+    let token = localStorage.getItem('token')
+    const isExpired = Date.now() >= jwtDecode(token).exp * 1000
 
     if (isExpired) {
-      localStorage.removeItem("token");
-      router.push({ name: "login" });
+      localStorage.removeItem('token')
+      router.push({ name: 'login' })
     } else {
-      let tokenDecoded = jwtDecode(token);
-      userStore.setUser(tokenDecoded);
+      const tokenDecoded = jwtDecode(token)
+      userStore.setUser(tokenDecoded)
+      const userId = tokenDecoded.id
+
+      const followersData = await getUserFollowers(userId)
+      const followingData = await getUserFollowing(userId)
+
+      userStore.setFollowers(followersData)
+      userStore.setFollowing(followingData)
     }
   }
-});
+})
 </script>
 
 <template>

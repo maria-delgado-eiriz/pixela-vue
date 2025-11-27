@@ -3,8 +3,11 @@ import { ref, onBeforeMount } from 'vue'
 import { useUserStore } from '../store/user.store'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faEdit, faHeart, faUserPlus, faUsers, faImage } from '@fortawesome/free-solid-svg-icons'
-import PostComponent from '../components/PostComponent.vue'
+import PostGrid from '../components/PostGrid.vue'
+import UserList from '../components/UserList.vue'
+import EmptyState from '../components/EmptyState.vue'
 import { getUserProfile } from '../api/users.api'
+
 const userStore = useUserStore()
 
 const activeTab = ref('details')
@@ -12,8 +15,6 @@ const profileData = ref(null)
 const loading = ref(true)
 
 const likedPosts = ref([])
-const following = ref([])
-const followers = ref([])
 const posts = ref([])
 
 const tabs = [
@@ -33,7 +34,7 @@ const getFullName = () => {
   return (
     (profileData.value?.firstName && profileData.value?.lastName
       ? `${profileData.value.firstName} ${profileData.value.lastName}`
-      : userStore.fullName || userStore.name) || 'Usuario'
+      : userStore.fullName || userStore.firstName) || 'Usuario'
   )
 }
 
@@ -44,8 +45,6 @@ onBeforeMount(async () => {
     profileData.value = profile
 
     if (profile.likedPosts) likedPosts.value = profile.likedPosts
-    if (profile.following) following.value = profile.following
-    if (profile.followers) followers.value = profile.followers
     if (profile.posts) posts.value = profile.posts
   } catch (error) {
     console.error('Error al cargar perfil:', error)
@@ -115,11 +114,11 @@ onBeforeMount(async () => {
               <span class="text-gray-400 ml-1">Posts</span>
             </div>
             <div>
-              <span class="text-white font-semibold">{{ followers.length }}</span>
+              <span class="text-white font-semibold">{{ userStore.followers.length }}</span>
               <span class="text-gray-400 ml-1">Seguidores</span>
             </div>
             <div>
-              <span class="text-white font-semibold">{{ following.length }}</span>
+              <span class="text-white font-semibold">{{ userStore.following.length }}</span>
               <span class="text-gray-400 ml-1">Seguidos</span>
             </div>
           </div>
@@ -212,84 +211,40 @@ onBeforeMount(async () => {
         <div v-else-if="activeTab === 'posts'">
           <h2 class="text-2xl font-bold text-white mb-6">Mis Publicaciones</h2>
 
-          <div v-if="posts.length === 0" class="text-center py-12">
-            <FontAwesomeIcon :icon="faImage" class="text-6xl text-gray-600 mb-4" />
-            <p class="text-gray-400">Aún no tienes ninguna publicación</p>
-          </div>
+          <EmptyState
+            v-if="posts.length === 0"
+            :icon="faImage"
+            message="Aún no tienes ninguna publicación"
+          />
 
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <PostComponent
-              v-for="post in posts"
-              :key="post.id"
-              :id="post.id"
-              :image="post.image"
-              :title="post.title"
-              :content="post.content"
-              :username="post.username"
-              :fullName="post.firstName + ' ' + post.lastName"
-              :likesCount="post.likesCount"
-              :isLikedByUser="post.isLikedByUser"
-            />
-          </div>
+          <PostGrid v-else :posts="posts" />
         </div>
 
         <!-- Me gusta -->
         <div v-else-if="activeTab === 'likes'">
           <h2 class="text-2xl font-bold text-white mb-6">Posts que me gustan</h2>
 
-          <div v-if="likedPosts.length === 0" class="text-center py-12">
-            <FontAwesomeIcon :icon="faHeart" class="text-6xl text-gray-600 mb-4" />
-            <p class="text-gray-400">Aún no has dado like a ninguna publicación</p>
-          </div>
+          <EmptyState
+            v-if="likedPosts.length === 0"
+            :icon="faHeart"
+            message="Aún no has dado like a ninguna publicación"
+          />
 
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <PostComponent
-              v-for="post in likedPosts"
-              :key="post.id"
-              :id="post.id"
-              :image="post.image"
-              :title="post.title"
-              :content="post.content"
-              :username="post.username"
-              :fullName="post.firstName + ' ' + post.lastName"
-              :likesCount="post.likesCount"
-              :isLikedByUser="post.isLikedByUser"
-            />
-          </div>
+          <PostGrid v-else :posts="likedPosts" />
         </div>
 
         <!-- Seguidos -->
         <div v-else-if="activeTab === 'following'">
           <h2 class="text-2xl font-bold text-white mb-6">Personas que sigues</h2>
 
-          <div v-if="following.length === 0" class="text-center py-12">
-            <FontAwesomeIcon :icon="faUserPlus" class="text-6xl text-gray-600 mb-4" />
-            <p class="text-gray-400">Aún no sigues a nadie</p>
-          </div>
+          <EmptyState
+            v-if="userStore.following.length === 0"
+            :icon="faUserPlus"
+            message="Aún no sigues a nadie"
+          />
 
           <div v-else class="space-y-4">
-            <div
-              v-for="user in following"
-              :key="user.id"
-              class="flex items-center justify-between p-4 bg-gray-900/50 border border-gray-700 rounded-lg hover:border-indigo-500/30 transition-all"
-            >
-              <div class="flex items-center space-x-4">
-                <div
-                  class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
-                >
-                  <span class="text-white font-semibold">{{ user.firstName.charAt(0) }}</span>
-                </div>
-                <div>
-                  <p class="text-white font-medium">{{ user.firstName + ' ' + user.lastName }}</p>
-                  <p class="text-gray-400 text-sm">@{{ user.username }}</p>
-                </div>
-              </div>
-              <button
-                class="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors text-sm"
-              >
-                Dejar de seguir
-              </button>
-            </div>
+            <UserList v-for="user in userStore.following" :key="user.id" :user="user" />
           </div>
         </div>
 
@@ -297,34 +252,14 @@ onBeforeMount(async () => {
         <div v-else-if="activeTab === 'followers'">
           <h2 class="text-2xl font-bold text-white mb-6">Tus seguidores</h2>
 
-          <div v-if="followers.length === 0" class="text-center py-12">
-            <FontAwesomeIcon :icon="faUsers" class="text-6xl text-gray-600 mb-4" />
-            <p class="text-gray-400">Aún no tienes seguidores</p>
-          </div>
+          <EmptyState
+            v-if="userStore.followers.length === 0"
+            :icon="faUsers"
+            message="Aún no tienes seguidores"
+          />
 
           <div v-else class="space-y-4">
-            <div
-              v-for="user in followers"
-              :key="user.id"
-              class="flex items-center justify-between p-4 bg-gray-900/50 border border-gray-700 rounded-lg hover:border-indigo-500/30 transition-all"
-            >
-              <div class="flex items-center space-x-4">
-                <div
-                  class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
-                >
-                  <span class="text-white font-semibold">{{ user.firstName.charAt(0) }}</span>
-                </div>
-                <div>
-                  <p class="text-white font-medium">{{ user.firstName + ' ' + user.lastName }}</p>
-                  <p class="text-gray-400 text-sm">@{{ user.username }}</p>
-                </div>
-              </div>
-              <button
-                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
-              >
-                Seguir
-              </button>
-            </div>
+            <UserList v-for="user in userStore.followers" :key="user.id" :user="user" />
           </div>
         </div>
       </div>

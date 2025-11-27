@@ -8,7 +8,9 @@ export const useUserStore = defineStore('user', {
     lastName: '',
     email: '',
     username: '',
-    imageProfile: '',
+    image: '',
+    followers: [],
+    following: [],
     iat: null,
     exp: null,
   }),
@@ -28,9 +30,15 @@ export const useUserStore = defineStore('user', {
       this.lastName = userData.lastName
       this.email = userData.email
       this.username = userData.username
-      this.imageProfile = null // TODO - change it
+      this.image = userData.image
       this.iat = userData.iat
       this.exp = userData.exp
+    },
+    setFollowers(followers) {
+      this.followers = followers && followers.length ? followers : []
+    },
+    setFollowing(following) {
+      this.following = following && following.length ? following : []
     },
     // Función para limpiar los datos de la store
     clearUser() {
@@ -39,12 +47,14 @@ export const useUserStore = defineStore('user', {
       this.lastName = ''
       this.email = ''
       this.username = ''
-      this.imageProfile = ''
+      this.image = ''
+      this.followers = []
+      this.following = []
       this.iat = null
       this.exp = null
     },
-    setImageProfile(imageProfile) {
-      this.imageProfile = imageProfile
+    setImageProfile(image) {
+      this.image = image
     },
   },
 })

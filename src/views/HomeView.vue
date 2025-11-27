@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onBeforeMount } from 'vue'
-import PostComponent from '../components/PostComponent.vue'
+import PostGrid from '../components/PostGrid.vue'
 import CreatePostModal from '../components/CreatePostModal.vue'
 import { useUserStore } from '../store/user.store'
 import { fetchPosts } from '../api/posts.api'
@@ -117,20 +117,7 @@ onBeforeMount(async () => {
       </div>
 
       <!-- Grid de posts -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <PostComponent
-          v-for="post in posts"
-          :key="post.id"
-          :id="post.id"
-          :image="post.image"
-          :title="post.title"
-          :content="post.content"
-          :username="post.username"
-          :fullName="post.firstName + ' ' + post.lastName"
-          :likesCount="post.likesCount"
-          :isLikedByUser="post.isLikedByUser"
-        />
-      </div>
+      <PostGrid v-else :posts="posts" />
     </div>
 
     <!-- Modal para crear publicación -->
