@@ -1,9 +1,9 @@
 <script setup>
-import { ref } from 'vue'
-import { useUserStore } from '../store/user.store'
+import { ref, watch } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faHeart as faHeartSolid, faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
+import { likePost, unlikePost } from '../api/posts.api'
 
 const props = defineProps({
   id: {
@@ -30,17 +30,46 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  likesCount: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+  isLikedByUser: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 })
 
-const userStore = useUserStore()
-const isLiked = ref(false)
+const localLikesCount = ref(props.likesCount)
+const localIsLiked = ref(props.isLikedByUser)
 
-const handleLike = () => {
-  isLiked.value = !isLiked.value
-  // TODO call enpoint to like the post
-  console.log('Post ID:', props.id)
-  console.log('Liker:', userStore.username)
-  console.log('Liked:', isLiked.value)
+// Sincronizar con las props si cambian
+watch(
+  () => props.likesCount,
+  newVal => {
+    localLikesCount.value = newVal
+  }
+)
+
+watch(
+  () => props.isLikedByUser,
+  newVal => {
+    localIsLiked.value = newVal
+  }
+)
+
+const handleLike = async () => {
+  if (localIsLiked.value) {
+    await unlikePost(props.id)
+    localLikesCount.value--
+    localIsLiked.value = false
+  } else {
+    await likePost(props.id)
+    localLikesCount.value++
+    localIsLiked.value = true
+  }
 }
 </script>
 
@@ -90,11 +119,11 @@ const handleLike = () => {
           @click="handleLike"
           :class="[
             'flex items-center space-x-2 transition-colors',
-            isLiked ? 'text-red-500 hover:text-red-600' : 'hover:text-indigo-400',
+            localIsLiked ? 'text-red-500 hover:text-red-600' : 'hover:text-indigo-400',
           ]"
         >
-          <FontAwesomeIcon :icon="isLiked ? faHeartSolid : faHeartRegular" />
-          <span>Me gusta</span>
+          <FontAwesomeIcon :icon="localIsLiked ? faHeartSolid : faHeartRegular" />
+          <span>{{ localLikesCount }}</span>
         </button>
         <button class="flex items-center space-x-2 hover:text-indigo-400 transition-colors">
           <FontAwesomeIcon :icon="faCommentDots" />

@@ -127,6 +127,8 @@ onBeforeMount(async () => {
           :content="post.content"
           :username="post.username"
           :fullName="post.firstName + ' ' + post.lastName"
+          :likesCount="post.likesCount"
+          :isLikedByUser="post.isLikedByUser"
         />
       </div>
     </div>
