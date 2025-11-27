@@ -76,11 +76,6 @@ onBeforeMount(() => {
             <span>Home</span>
           </router-link>
 
-          <a @click="goToProfile()" class="nav-btn cursor-pointer">
-            <FontAwesomeIcon :icon="faUser" />
-            <span>Profile</span>
-          </a>
-
           <router-link to="/search" class="nav-btn">
             <FontAwesomeIcon :icon="faMagnifyingGlass" />
             <span>Buscar</span>
@@ -92,6 +87,10 @@ onBeforeMount(() => {
           </router-link>
 
           <div class="w-px h-8 bg-gray-600 mx-2"></div>
+
+          <a @click="goToProfile()" class="nav-btn-icon cursor-pointer" title="Profile">
+            <FontAwesomeIcon :icon="faUser" />
+          </a>
 
           <a @click="logout()" class="nav-btn-icon" title="Logout">
             <FontAwesomeIcon :icon="faSignOutAlt" />
