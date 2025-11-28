@@ -153,6 +153,7 @@ const handleCommentsLoaded = count => {
       <CommentsSection
         ref="commentsSection"
         :postId="id"
+        :postAuthorId="author.id"
         :isVisible="showComments"
         @commentsLoaded="handleCommentsLoaded"
       />

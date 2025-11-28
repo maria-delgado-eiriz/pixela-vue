@@ -27,3 +27,8 @@ export const createComment = async (postId, content) => {
   const response = await httpClient.post(`${END_POINT}/${postId}/comments`, { content })
   return response.data
 }
+
+export const deleteComment = async (postId, commentId) => {
+  const response = await httpClient.delete(`${END_POINT}/${postId}/comments/${commentId}`)
+  return response.data
+}
