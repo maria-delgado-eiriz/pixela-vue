@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { getUserFollowers, getUserFollowing } from '@/api/users.api.js'
 
 export const useUserStore = defineStore('user', {
   // Estado de la store: aquí se almacenan los datos del usuario
@@ -33,12 +34,16 @@ export const useUserStore = defineStore('user', {
       this.iat = userData.iat
       this.exp = userData.exp
     },
-    setFollowers(followers) {
-      this.followers = followers && followers.length ? followers : []
+    async loadFollowers(userId) {
+      const followersData = await getUserFollowers(userId)
+      this.followers = followersData && followersData.length ? followersData : []
     },
-    setFollowing(following) {
-      this.following = following && following.length ? following : []
+
+    async loadFollowing(userId) {
+      const followingData = await getUserFollowing(userId)
+      this.following = followingData && followingData.length ? followingData : []
     },
+
     setUserImage(image) {
       this.image = image
     },

@@ -4,7 +4,6 @@ import { signup } from '../api/auth.api.js'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user.store'
 import { jwtDecode } from 'jwt-decode'
-import { getUserFollowers, getUserFollowing } from '@/api/users.api.js'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -74,11 +73,8 @@ const submitRegister = async () => {
       userStore.setUser(tokenDecoded)
       const userId = tokenDecoded.id
 
-      const followersData = await getUserFollowers(userId)
-      const followingData = await getUserFollowing(userId)
-
-      userStore.setFollowers(followersData)
-      userStore.setFollowing(followingData)
+      await userStore.loadFollowers(userId)
+      await userStore.loadFollowing(userId)
 
       router.push({ name: 'home' })
     }

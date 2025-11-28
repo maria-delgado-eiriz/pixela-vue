@@ -15,15 +15,15 @@ const userStore = useUserStore()
 
 const isUserLoggedFollowing = ref(false)
 
-const handleAction = () => {
+const handleAction = async () => {
   if (isUserLoggedFollowing.value) {
-    // Lógica para dejar de seguir
-    unfollowUser(props.user.id)
+    await unfollowUser(props.user.id)
     isUserLoggedFollowing.value = false
   } else {
-    followUser(props.user.id)
+    await followUser(props.user.id)
     isUserLoggedFollowing.value = true
   }
+  await userStore.loadFollowing(userStore.id)
 }
 
 onBeforeMount(async () => {
