@@ -10,6 +10,7 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { likePost, unlikePost, getPostComments, createComment } from '../api/posts.api'
 import { useUserStore } from '../store/user.store'
 import ProfileImage from './ProfileImage.vue'
+import { getUserFullName } from '../utils/formaters'
 
 const userStore = useUserStore()
 
@@ -117,7 +118,8 @@ const handleSendComment = async () => {
       content: newComment.value,
       author: {
         username: userStore.username,
-        fullName: userStore.fullName,
+        firstName: userStore.firstName,
+        lastName: userStore.lastName,
         image: userStore.image,
       },
       createdAt: new Date().toISOString(),
@@ -244,7 +246,7 @@ const handleSendComment = async () => {
             <div class="flex-1 bg-gray-900/30 rounded-lg px-3 py-2">
               <div class="flex items-baseline space-x-2 mb-1">
                 <span class="text-gray-200 font-medium text-sm">{{
-                  comment.author.firstName + ' ' + comment.author.lastName
+                  getUserFullName(comment.author.firstName, comment.author.lastName)
                 }}</span>
                 <span class="text-gray-500 text-xs">@{{ comment.author.username }}</span>
               </div>

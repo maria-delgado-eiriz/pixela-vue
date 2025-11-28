@@ -1,4 +1,5 @@
 <script setup>
+import { getUserFullName } from '../utils/formaters'
 import PostComponent from './PostComponent.vue'
 
 defineProps({
@@ -20,7 +21,7 @@ defineProps({
       :content="post.content"
       :author="{
         username: post.author.username,
-        fullName: `${post.author.firstName} ${post.author.lastName}`,
+        fullName: getUserFullName(post.author.firstName, post.author.lastName),
         profileImage: post.author.profileImage,
       }"
       :likesCount="post.likesCount"
