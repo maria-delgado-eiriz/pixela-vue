@@ -63,19 +63,16 @@ const saveImage = async () => {
     uploading.value = true
 
     const response = await updateUserImage(userStore.id, imagePreview.value)
-
     // Actualizar la imagen en el store y en profileData
-    if (response.imageProfile) {
-      userStore.image = response.imageProfile
+    if (response) {
+      userStore.image = imagePreview.value
       if (profileData.value) {
-        profileData.value.imageProfile = response.imageProfile
+        profileData.value.imageProfile = imagePreview.value
       }
     }
 
     closeModal()
   } catch (error) {
-    console.error('Error completo:', error)
-    console.error('Error response:', error.response)
     console.error('Error message:', error.message)
     const errorMsg = error.response?.data?.message || error.message || 'Error desconocido'
     alert(`Error al actualizar la imagen de perfil: ${errorMsg}`)
