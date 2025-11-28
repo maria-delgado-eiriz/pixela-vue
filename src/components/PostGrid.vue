@@ -18,8 +18,11 @@ defineProps({
       :image="post.image"
       :title="post.title"
       :content="post.content"
-      :username="post.username"
-      :fullName="`${post.firstName} ${post.lastName}`"
+      :author="{
+        username: post.author.username,
+        fullName: `${post.author.firstName} ${post.author.lastName}`,
+        profileImage: post.author.profileImage,
+      }"
       :likesCount="post.likesCount"
       :isLikedByUser="post.isLikedByUser"
     />

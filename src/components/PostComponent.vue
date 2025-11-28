@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faHeart as faHeartSolid, faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons'
 import { likePost, unlikePost } from '../api/posts.api'
+import ProfileImage from './ProfileImage.vue'
 
 const props = defineProps({
   id: {
@@ -22,13 +23,12 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  username: {
-    type: String,
+  author: {
+    type: Object,
     required: true,
-  },
-  fullName: {
-    type: String,
-    required: true,
+    validator: value => {
+      return value.username && value.fullName
+    },
   },
   likesCount: {
     type: Number,
@@ -90,14 +90,10 @@ const handleLike = async () => {
     <div class="p-6">
       <!-- Autor -->
       <div class="flex items-center space-x-3 mb-4">
-        <div
-          class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
-        >
-          <span class="text-white font-semibold text-sm">{{ fullName.charAt(0) }}</span>
-        </div>
+        <ProfileImage :firstName="author.fullName" :image="author.image" />
         <div>
-          <p class="text-gray-200 font-medium text-sm">{{ fullName }}</p>
-          <p class="text-gray-500 text-xs">@{{ username }}</p>
+          <p class="text-gray-200 font-medium text-sm">{{ author.fullName }}</p>
+          <p class="text-gray-500 text-xs">@{{ author.username }}</p>
         </div>
       </div>
 

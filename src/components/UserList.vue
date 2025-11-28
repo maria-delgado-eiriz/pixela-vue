@@ -2,6 +2,7 @@
 import { onBeforeMount, ref } from 'vue'
 import { useUserStore } from '../store/user.store'
 import { followUser, unfollowUser } from '../api/users.api'
+import ProfileImage from './ProfileImage.vue'
 
 const props = defineProps({
   user: {
@@ -25,10 +26,6 @@ const handleAction = () => {
   }
 }
 
-const getUserInitial = () => {
-  return props.user.firstName?.charAt(0)?.toUpperCase() || 'U'
-}
-
 onBeforeMount(async () => {
   isUserLoggedFollowing.value = userStore.following.some(
     followedUser => followedUser.id === props.user.id
@@ -42,18 +39,7 @@ onBeforeMount(async () => {
   >
     <div class="flex items-center space-x-4">
       <!-- Avatar -->
-      <div
-        v-if="user.imageProfile"
-        class="w-12 h-12 rounded-full overflow-hidden border-2 border-indigo-500/30"
-      >
-        <img :src="user.imageProfile" :alt="user.firstName" class="w-full h-full object-cover" />
-      </div>
-      <div
-        v-else
-        class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center"
-      >
-        <span class="text-white font-semibold">{{ getUserInitial() }}</span>
-      </div>
+      <ProfileImage :firstName="user.firstName" :imageProfile="user.imageProfile" />
 
       <!-- Info -->
       <div>
