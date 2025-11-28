@@ -39,7 +39,7 @@ onBeforeMount(async () => {
   >
     <div class="flex items-center space-x-4">
       <!-- Avatar -->
-      <ProfileImage :firstName="user.firstName" :imageProfile="user.imageProfile" />
+      <ProfileImage :firstName="user.firstName" :profileImage="user.profileImage" />
 
       <!-- Info -->
       <div>

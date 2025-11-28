@@ -67,7 +67,7 @@ const saveImage = async () => {
     if (response) {
       userStore.image = imagePreview.value
       if (profileData.value) {
-        profileData.value.imageProfile = imagePreview.value
+        profileData.value.profileImage = imagePreview.value
       }
     }
 
@@ -145,11 +145,11 @@ onBeforeMount(async () => {
             >
               <!-- Imagen de perfil o inicial -->
               <div
-                v-if="profileData?.imageProfile || userStore.image"
+                v-if="profileData?.profileImage || userStore.image"
                 class="w-32 h-32 rounded-full border-4 border-gray-800 overflow-hidden shadow-xl"
               >
                 <img
-                  :src="profileData?.imageProfile || userStore.image"
+                  :src="profileData?.profileImage || userStore.image"
                   :alt="profileData?.firstName || userStore.firstName"
                   class="w-full h-full object-cover"
                 />

@@ -17,3 +17,13 @@ export const unlikePost = async postId => {
   const response = await httpClient.post(`${END_POINT}/${postId}/unlike`)
   return response.data
 }
+
+export const getPostComments = async postId => {
+  const response = await httpClient.get(`${END_POINT}/${postId}/comments`)
+  return response.data
+}
+
+export const createComment = async (postId, content) => {
+  const response = await httpClient.post(`${END_POINT}/${postId}/comments`, { content })
+  return response.data
+}

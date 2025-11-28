@@ -26,11 +26,11 @@ const submitLogin = async () => {
 
     const followersData = await getUserFollowers(userId)
     const followingData = await getUserFollowing(userId)
-    const imageProfile = await getUserImage(userId)
+    const profileImage = await getUserImage(userId)
 
     userStore.setFollowers(followersData)
     userStore.setFollowing(followingData)
-    userStore.setUserImage(imageProfile)
+    userStore.setUserImage(profileImage)
 
     router.push({ name: 'home' })
   }
