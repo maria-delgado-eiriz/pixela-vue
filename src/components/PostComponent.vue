@@ -90,7 +90,7 @@ const handleLike = async () => {
     <div class="p-6">
       <!-- Autor -->
       <div class="flex items-center space-x-3 mb-4">
-        <ProfileImage :firstName="author.fullName" :image="author.image" />
+        <ProfileImage :firstName="author.fullName" :imageProfile="author.profileImage" />
         <div>
           <p class="text-gray-200 font-medium text-sm">{{ author.fullName }}</p>
           <p class="text-gray-500 text-xs">@{{ author.username }}</p>

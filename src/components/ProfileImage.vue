@@ -11,6 +11,7 @@ const props = defineProps({
 })
 
 const getUserInitial = () => {
+  console.log(props.imageProfile)
   return props.firstName?.charAt(0)?.toUpperCase() || 'U'
 }
 </script>
