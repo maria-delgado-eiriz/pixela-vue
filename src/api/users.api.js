@@ -31,3 +31,15 @@ export const searchUsers = async searchTerm => {
   const response = await httpClient.get(`${BASE_PATH}/search?query=${searchTerm}`)
   return response.data
 }
+
+export const updateUserImage = async (userId, imageBase64) => {
+  const response = await httpClient.put(`${BASE_PATH}/${userId}/image`, {
+    image: imageBase64,
+  })
+  return response.data
+}
+
+export const getUserImage = async userId => {
+  const response = await httpClient.get(`${BASE_PATH}/${userId}/image`)
+  return response.data
+}

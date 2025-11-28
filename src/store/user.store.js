@@ -30,7 +30,6 @@ export const useUserStore = defineStore('user', {
       this.lastName = userData.lastName
       this.email = userData.email
       this.username = userData.username
-      this.image = userData.image
       this.iat = userData.iat
       this.exp = userData.exp
     },
@@ -39,6 +38,9 @@ export const useUserStore = defineStore('user', {
     },
     setFollowing(following) {
       this.following = following && following.length ? following : []
+    },
+    setUserImage(image) {
+      this.image = image
     },
     // Función para limpiar los datos de la store
     clearUser() {

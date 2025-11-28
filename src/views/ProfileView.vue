@@ -2,20 +2,87 @@
 import { ref, onBeforeMount } from 'vue'
 import { useUserStore } from '../store/user.store'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faEdit, faHeart, faUserPlus, faUsers, faImage } from '@fortawesome/free-solid-svg-icons'
+import {
+  faEdit,
+  faHeart,
+  faUserPlus,
+  faUsers,
+  faImage,
+  faTimes,
+} from '@fortawesome/free-solid-svg-icons'
 import PostGrid from '../components/PostGrid.vue'
 import UserList from '../components/UserList.vue'
 import EmptyState from '../components/EmptyState.vue'
-import { getUserProfile } from '../api/users.api'
+import { getUserProfile, updateUserImage } from '../api/users.api'
 
 const userStore = useUserStore()
 
 const activeTab = ref('details')
 const profileData = ref(null)
 const loading = ref(true)
+const isHoveringImage = ref(false)
+const showImageModal = ref(false)
+const selectedImage = ref(null)
+const imagePreview = ref(null)
+const fileInput = ref(null)
+const uploading = ref(false)
 
 const likedPosts = ref([])
 const posts = ref([])
+
+const handleImageEdit = () => {
+  fileInput.value?.click()
+}
+
+const onFileSelected = event => {
+  const file = event.target.files?.[0]
+  if (file && file.type.startsWith('image/')) {
+    selectedImage.value = file
+    const reader = new FileReader()
+    reader.onload = e => {
+      imagePreview.value = e.target?.result
+      showImageModal.value = true
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+const closeModal = () => {
+  showImageModal.value = false
+  selectedImage.value = null
+  imagePreview.value = null
+  if (fileInput.value) {
+    fileInput.value.value = ''
+  }
+}
+
+const saveImage = async () => {
+  if (!imagePreview.value) return
+
+  try {
+    uploading.value = true
+
+    const response = await updateUserImage(userStore.id, imagePreview.value)
+
+    // Actualizar la imagen en el store y en profileData
+    if (response.imageProfile) {
+      userStore.image = response.imageProfile
+      if (profileData.value) {
+        profileData.value.imageProfile = response.imageProfile
+      }
+    }
+
+    closeModal()
+  } catch (error) {
+    console.error('Error completo:', error)
+    console.error('Error response:', error.response)
+    console.error('Error message:', error.message)
+    const errorMsg = error.response?.data?.message || error.message || 'Error desconocido'
+    alert(`Error al actualizar la imagen de perfil: ${errorMsg}`)
+  } finally {
+    uploading.value = false
+  }
+}
 
 const tabs = [
   { id: 'details', label: 'Perfil', icon: faEdit },
@@ -56,6 +123,9 @@ onBeforeMount(async () => {
 
 <template>
   <div class="min-h-screen py-8">
+    <!-- Input file oculto -->
+    <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="onFileSelected" />
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Header con imagen de perfil -->
       <div
@@ -70,14 +140,20 @@ onBeforeMount(async () => {
         <div class="relative px-8 pb-8">
           <!-- Imagen de perfil -->
           <div class="flex justify-between items-start -mt-20 mb-4">
-            <div class="relative">
+            <div
+              class="relative group cursor-pointer"
+              @mouseenter="isHoveringImage = true"
+              @mouseleave="isHoveringImage = false"
+              @click="handleImageEdit"
+            >
+              <!-- Imagen de perfil o inicial -->
               <div
-                v-if="profileData?.imageProfile || userStore.imageProfile"
+                v-if="profileData?.imageProfile || userStore.image"
                 class="w-32 h-32 rounded-full border-4 border-gray-800 overflow-hidden shadow-xl"
               >
                 <img
-                  :src="profileData?.imageProfile || userStore.imageProfile"
-                  :alt="profileData?.firstName || userStore.name"
+                  :src="profileData?.imageProfile || userStore.image"
+                  :alt="profileData?.firstName || userStore.firstName"
                   class="w-full h-full object-cover"
                 />
               </div>
@@ -86,6 +162,13 @@ onBeforeMount(async () => {
                 class="w-32 h-32 rounded-full border-4 border-gray-800 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl"
               >
                 <span class="text-white font-bold text-4xl">{{ getUserInitial() }}</span>
+              </div>
+
+              <!-- Overlay con icono de editar (aparece al hacer hover) -->
+              <div
+                class="absolute inset-0 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+              >
+                <FontAwesomeIcon :icon="faEdit" class="text-white text-2xl" />
               </div>
             </div>
 
@@ -261,6 +344,55 @@ onBeforeMount(async () => {
           <div v-else class="space-y-4">
             <UserList v-for="user in userStore.followers" :key="user.id" :user="user" />
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal de preview de imagen -->
+    <div
+      v-if="showImageModal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+      @click.self="closeModal"
+    >
+      <div
+        class="bg-gray-800 rounded-2xl p-8 max-w-md w-full border border-indigo-500/30 shadow-2xl"
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-white">Vista previa</h3>
+          <button @click="closeModal" class="text-gray-400 hover:text-white transition-colors">
+            <FontAwesomeIcon :icon="faTimes" class="text-xl" />
+          </button>
+        </div>
+
+        <!-- Preview circular de la imagen -->
+        <div class="flex justify-center mb-6">
+          <div
+            class="w-48 h-48 rounded-full overflow-hidden border-4 border-indigo-500/30 shadow-xl"
+          >
+            <img
+              v-if="imagePreview"
+              :src="imagePreview"
+              alt="Preview"
+              class="w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex gap-4">
+          <button
+            @click="closeModal"
+            class="flex-1 px-4 py-3 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="saveImage"
+            :disabled="uploading"
+            class="flex-1 px-4 py-3 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {{ uploading ? 'Guardando...' : 'Guardar' }}
+          </button>
         </div>
       </div>
     </div>

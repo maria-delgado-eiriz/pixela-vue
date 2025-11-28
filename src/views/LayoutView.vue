@@ -15,7 +15,7 @@ import { ref, onBeforeMount } from 'vue'
 import { useUserStore } from '../store/user.store'
 import { jwtDecode } from 'jwt-decode'
 import { useRoute } from 'vue-router'
-import { getUserFollowers, getUserFollowing } from '@/api/users.api.js'
+import { getUserFollowers, getUserFollowing, getUserImage } from '@/api/users.api.js'
 
 const route = useRoute()
 const router = useRouter()
@@ -50,9 +50,11 @@ onBeforeMount(async () => {
 
       const followersData = await getUserFollowers(userId)
       const followingData = await getUserFollowing(userId)
+      const imageProfile = await getUserImage(userId)
 
       userStore.setFollowers(followersData)
       userStore.setFollowing(followingData)
+      userStore.setUserImage(imageProfile)
     }
   }
 })
